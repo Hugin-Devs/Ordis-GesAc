@@ -1,0 +1,47 @@
+tabla_persona:
+  cedula_identidad      -> int (PK)
+  nombres               -> varchar
+  apellidos             -> varchar
+  correo                -> varchar
+  telefono              -> varchar (Mejor que int, para incluir códigos de área ej: +58)
+  direccion_habitacion  -> text
+
+tabla_ficha_medica_fisica: (Opcional, separada para no recargar datos básicos)
+  id_ficha              -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+  tipo_sangre           -> enum
+  peso                  -> int
+  talla_camisa          -> varchar/set
+  talla_pantalon        -> varchar/set
+  talla_zapato          -> varchar/set
+  alergias              -> json
+  discapacidades        -> json
+  afecciones_cronicas   -> json
+
+tabla_estudiante:
+  id_estudiante         -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+  es_becado             -> tinyint/boolean
+
+tabla_representante:
+  id_representante      -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+
+tabla_estudiante_representante: (Tabla intermedia por si un niño tiene 2 representantes, o 1 representante tiene varios niños)
+  id_estudiante_fk      -> int
+  id_representante_fk   -> int
+  parentesco            -> varchar (ej. Madre, Padre, Tío)
+
+tabla_profesor:
+  id_profesor           -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+
+tabla_asignatura:
+  id_asignatura         -> int (PK)
+  nombre_asignatura     -> varchar
+  descripcion           -> text
+
+tabla_profesor_asignatura: (Tabla intermedia M:N)
+  id_profesor_fk        -> int
+  id_asignatura_fk      -> int
+  periodo_academico     -> varchar (Opcional, para saber cuándo dio la materia)

@@ -1,0 +1,98 @@
+tabla_persona:
+  cedula_identidad      -> int (PK)
+  nombres               -> varchar
+  apellidos             -> varchar
+  correo                -> varchar
+  telefono              -> varchar (Mejor que int, para incluir códigos de área ej: +58)
+  direccion_habitacion  -> text
+
+tabla_ficha_medica_fisica: (Opcional, separada para no recargar datos básicos)
+  id_ficha              -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+  tipo_sangre           -> enum
+  peso                  -> int
+  talla_camisa          -> varchar/set
+  talla_pantalon        -> varchar/set
+  talla_zapato          -> varchar/set
+  alergias              -> json
+  discapacidades        -> json
+  afecciones_cronicas   -> json
+
+tabla_estudiante:
+  id_estudiante         -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+  es_becado             -> tinyint/boolean
+
+tabla_representante:
+  id_representante      -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+
+tabla_estudiante_representante: (Tabla intermedia por si un niño tiene 2 representantes, o 1 representante tiene varios niños)
+  id_estudiante_fk      -> int
+  id_representante_fk   -> int
+  parentesco            -> varchar (ej. Madre, Padre, Tío)
+
+tabla_profesor:
+  id_profesor           -> int (PK)
+  cedula_persona_fk     -> int (FK hacia tabla_persona)
+
+tabla_asignatura:
+  id_asignatura     -> int (PK)
+  id_fase_fk        -> int (FK hacia tabla_fase_academica. Ej: "Matemáticas" pertenece al "1er Semestre")
+  nombre_asignatura -> varchar
+  descripcion       -> text
+
+tabla_profesor_asignatura: (Tabla intermedia M:N)
+  id_profesor_fk    -> int
+  id_asignatura_fk  -> int
+  id_periodo_fk     -> int (FK hacia tabla_periodo_academico. Para saber EXACTAMENTE en qué período ese profesor dio esa materia).
+  
+tabla_periodo_academico:
+  id_periodo      -> int (PK)
+  nombre_periodo  -> varchar (Ej: "Año Escolar 2024-2025", "Semestre 2024-I")
+  fecha_inicio    -> date
+  fecha_fin       -> date
+  estado          -> varchar/enum (Ej: 'Planificación', 'Activo', 'Finalizado')
+  
+tabla_programa_educativo: (Representa la "Carrera" o el "Nivel General")
+  id_programa     -> int (PK)
+  nombre_programa -> varchar (Ej: "Ingeniería en Informática", "Educación Primaria")
+  descripcion     -> text
+
+tabla_fase_academica: (Representa los semestres, grados o trayectos)
+  id_fase         -> int (PK)
+  id_programa_fk  -> int (FK hacia tabla_programa_educativo)
+  nombre_fase     -> varchar (Ej: "1er Semestre", "3er Grado", "Trayecto II")
+  tipo_fase       -> varchar (Ej: "Semestre", "Grado", "Trayecto", "Trimestre")
+  orden_secuencia -> int (Crucial: Un número ej. 1, 2, 3... para saber qué fase va primero y poder calcular avances o promociones).
+  
+tabla_matricula: (La cabecera de la inscripción)
+  id_matricula          -> int (PK)
+  id_estudiante_fk      -> int (FK hacia tabla_estudiante)
+  id_periodo_fk         -> int (FK hacia tabla_periodo_academico)
+  id_fase_fk            -> int (FK hacia tabla_fase_academica. Ej: Se inscribió para el "2do Semestre")
+  fecha_inscripcion     -> date/datetime
+  estado_matricula      -> varchar/enum (Ej: 'Activa', 'Retirada', 'Suspendida', 'Completada')
+
+tabla_matricula_detalle: (Las asignaturas específicas que va a ver)
+  id_detalle            -> int (PK)
+  id_matricula_fk       -> int (FK hacia tabla_matricula)
+  id_profesor_asignatura_fk -> int (FK hacia la tabla intermedia que creamos antes. Esto es CLAVE: inscribe la asignatura conectada al profesor que la dicta en ese periodo)
+  estado_asignatura     -> varchar/enum (Ej: 'Cursando', 'Aprobada', 'Reprobada', 'Retirada')
+  nota_final_definitiva -> decimal (Un campo para guardar el promedio final una vez termine el periodo, por optimización de consultas)
+  
+tabla_plan_evaluacion: (El profesor define CÓMO va a evaluar su clase)
+  id_evaluacion         -> int (PK)
+  id_profesor_asignatura_fk -> int (FK hacia la clase específica de ese periodo)
+  nombre_evaluacion     -> varchar (Ej: "1er Parcial", "Proyecto Final", "Exposición")
+  descripcion_evaluacion -> varchar 
+  porcentaje_peso       -> decimal (Ej: 20.00, 25.00. La suma total por clase debería dar 100%)
+  fecha_estimada        -> date (Cuándo se realizará la evaluación)
+
+tabla_calificacion: (Las notas individuales de cada estudiante)
+  id_calificacion       -> int (PK)
+  id_detalle_matricula_fk -> int (FK hacia tabla_matricula_detalle. Identifica al estudiante en esa clase)
+  id_evaluacion_fk      -> int (FK hacia tabla_plan_evaluacion. Identifica qué examen es)
+  nota_obtenida         -> decimal (Ej: 15.5, 18.0, o basado en la escala del país)
+  observaciones         -> text (Por si el profesor quiere dejar un comentario, ej: "Entregó tarde")
+

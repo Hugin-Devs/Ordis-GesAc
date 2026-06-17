@@ -1,0 +1,7 @@
+deberiamos tener una tabla para los periodos academicos tambien.
+
+debemos tener tambien una tabla con los 
+
+
+
+adicionalmente, hay que definir como vamos a almacenar las evaluaciones de cada asignatura. Un profesor imparte una asignatura, define las evaluaciones de la misma, los estudiantes 
