@@ -23,6 +23,12 @@ Siempre que crees un nuevo archivo de migración en `src/database/migrations/`, 
 docker-compose exec app php artisan migrate
 ```
 
+**Nota sobre Autenticación:** El sistema utiliza el modelo nativo `User` de Laravel y la tabla `users`. Para inicializar el usuario administrador (admin@ordis.com), ejecuta:
+```bash
+docker-compose exec app php artisan db:seed
+```
+
+
 ## 4. Cambios en Assets Frontend (CSS, JS)
 Si estás desarrollando con Vite, debes mantener el servidor de compilación activo para ver cambios en tiempo real:
 ```bash
