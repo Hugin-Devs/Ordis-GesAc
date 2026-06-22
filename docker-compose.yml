@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   # PHP Application
   app:
@@ -13,6 +12,18 @@ services:
       - ./src:/var/www
     networks:
       - ordis-network
+
+  # Node.js for Frontend
+  node:
+    image: node:22-alpine
+    container_name: ordis-node
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+    networks:
+      - ordis-network
+    command: npm run dev
 
   # Nginx Web Server
   web:
