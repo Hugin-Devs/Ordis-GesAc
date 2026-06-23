@@ -12,6 +12,10 @@ Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
 Route::get('/dashboard', function () {
-    return 'Bienvenido al Dashboard';
+    return view('dashboard');
+})->middleware('auth');
+
+Route::get('/registro', function () {
+    return view('registro.index');
 })->middleware('auth');
 
