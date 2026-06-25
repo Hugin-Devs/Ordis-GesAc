@@ -29,6 +29,7 @@ class AdminUserSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@ordis.com',
             'password' => Hash::make('password123'),
+            'role' => 'admin',
             'cedula_persona_fk' => 12345678,
             'estado_cuenta' => 'Activo',
         ]);

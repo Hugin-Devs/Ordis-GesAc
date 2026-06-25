@@ -5,13 +5,14 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
         'cedula_persona_fk',
         'estado_cuenta',
         'ultimo_acceso',
@@ -50,4 +52,20 @@ class User extends Authenticatable
         ];
     }
 
+    public function persona()
+    {
+        return $this->belongsTo(Persona::class, 'cedula_persona_fk', 'cedula_identidad');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function hasPermission(string $slug)
+    {
+        return $this->roles()->whereHas('permissions', function ($query) use ($slug) {
+            $query->where('slug', $slug);
+        })->exists();
+    }
 }

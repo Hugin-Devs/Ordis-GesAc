@@ -22,6 +22,11 @@ class LoginController extends Controller
         // Attempt login with email
         if (Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
+
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended('/admin/dashboard');
+            }
+
             return redirect()->intended('/dashboard');
         }
 
